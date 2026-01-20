@@ -1,0 +1,14 @@
+services:
+  conexao-cachu:
+    container_name: conexao-cachu
+    build: .
+    ports:
+      - 3003:3003
+    env_file:
+      - .env
+    restart: unless-stopped
+    # ADICIONE ISSO AQUI:
+    volumes:
+      - /opt/stacks/conexao-cachu:/app
+      - /app/node_modules
+networks: {}

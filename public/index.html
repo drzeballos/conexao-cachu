@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexão Cachú - Caronas Solidárias</title>
+    <meta name="description"
+        content="Conectando viajantes, guias e turistas às cachoeiras da Chapada dos Veadeiros. Encontre ou ofereça caronas de forma simples.">
+
+    <meta property="og:site_name" content="Conexão Cachú">
+    <meta property="og:title" content="Conexão Cachú - Sua próxima trilha começa aqui!">
+    <meta property="og:description"
+        content="Encontre caronas solidárias para as cachoeiras. Rápido, fácil e sem burocracia.">
+    <meta property="og:image" content="https://conexaocachu.bots.at.eu.org/img/conexao-cachu.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://conexaocachu.bots.at.eu.org/">
+
+    <meta name="theme-color" content="#0891b2">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/img/conexao-chapada-192-pwa.png">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(() => console.log('Service Worker registrado! 🔵'))
+                    .catch((err) => console.log('Falha no SW 🔴', err));
+            });
+        }
+    </script>
+</head>
+
+<body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col selection:bg-cyan-200">
+
+    <header class="bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-6 flex justify-between items-center">
+            <a href="/" class="group">
+                <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2 group-hover:opacity-90 transition">
+                    Conexão Cachú <span
+                        class="text-xs bg-white/20 px-2 py-1 rounded-full uppercase tracking-wider border border-white/10">Beta</span>
+                </h1>
+                <p
+                    class="text-sm text-cyan-50 mt-1 opacity-90 group-hover:underline decoration-cyan-300/50 underline-offset-2">
+                    Caronas solidárias num pulo!</p>
+            </a>
+
+            <div class="space-x-2 flex">
+                <a href="form.html?type=offer"
+                    class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-bold transition border border-white/10 shadow-sm hidden md:block">Oferecer</a>
+                <a href="form.html?type=request"
+                    class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-bold transition border border-white/10 shadow-sm hidden md:block">Solicitar</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-1">
+
+        <div id="highlightContainer"
+            class="mb-6 relative overflow-hidden rounded-xl transition-all duration-500 opacity-0 scale-95 shadow-sm min-h-[100px]">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6 md:hidden">
+            <a href="form.html?type=offer"
+                class="flex flex-col items-center justify-center bg-cyan-600 text-white p-4 rounded-2xl shadow-lg hover:bg-cyan-700 transition border-b-4 border-cyan-800 active:border-b-0 active:translate-y-1">
+                <span class="text-3xl mb-2">🚙</span>
+                <span class="font-bold">Oferecer Carona</span>
+            </a>
+            <a href="form.html?type=request"
+                class="flex flex-col items-center justify-center bg-orange-500 text-white p-4 rounded-2xl shadow-lg hover:bg-orange-600 transition border-b-4 border-orange-700 active:border-b-0 active:translate-y-1">
+                <span class="text-3xl mb-2">🙋‍♀️</span>
+                <span class="font-bold">Pedir Carona</span>
+            </a>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-200 mb-6 flex flex-col md:flex-row gap-3">
+            <div class="flex-1">
+                <label for="filterOrigin"
+                    class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 ml-1">Origem</label>
+                <select id="filterOrigin"
+                    class="w-full p-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-700 font-medium focus:ring-2 focus:ring-cyan-500 outline-none transition appearance-none"
+                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27292.4%27%20height%3D%27292.4%27%3E%3Cpath%20fill%3D%27%230891b2%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2087.2c0%205%201.8%209.3%205.4%2013l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%20100.3c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.3-5.4-13z%27%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.8rem;">
+                    <option value="">Todas as Origens</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                <label for="filterDestination"
+                    class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 ml-1">Destino</label>
+                <select id="filterDestination"
+                    class="w-full p-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-700 font-medium focus:ring-2 focus:ring-cyan-500 outline-none transition appearance-none"
+                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27292.4%27%20height%3D%27292.4%27%3E%3Cpath%20fill%3D%27%230891b2%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2087.2c0%205%201.8%209.3%205.4%2013l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%20100.3c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.3-5.4-13z%27%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.8rem;">
+                    <option value="">Todos os Destinos</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="w-full flex items-center justify-between mb-4">
+            <div class="flex gap-2">
+                <button id="btnFilterOffer" onclick="filtrarTipo('offer')"
+                    class="px-4 py-2 rounded-xl font-bold text-sm transition border border-transparent bg-gray-100 text-gray-500 hover:bg-cyan-50 focus:outline-none">
+                    OFERTAS
+                </button>
+
+                <button id="btnFilterRequest" onclick="filtrarTipo('request')"
+                    class="px-4 py-2 rounded-xl font-bold text-sm transition border border-transparent bg-gray-100 text-gray-500 hover:bg-orange-50 focus:outline-none">
+                    PEDIDOS
+                </button>
+            </div>
+
+            <span id="rideCount"
+                class="text-sm font-medium text-cyan-700 bg-cyan-50 px-3 py-1 rounded-full border border-cyan-100 shadow-sm">Carregando...</span>
+        </div>
+
+        <div id="ridesContainer" class="space-y-4">
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-100 border-t border-stone-200 py-8 mt-auto">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+
+            <div class="flex flex-wrap justify-center gap-3 mb-6">
+                <a href="ajuda.html"
+                    class="inline-flex items-center gap-1 text-cyan-700 font-bold hover:bg-cyan-100 bg-cyan-50 px-4 py-2 rounded-lg text-sm border border-cyan-100 transition">
+                    ❓ Como usar
+                </a>
+                <a href="termos.html"
+                    class="inline-flex items-center gap-1 text-stone-600 font-medium hover:bg-stone-200 bg-stone-100 px-4 py-2 rounded-lg text-sm border border-stone-200 transition">
+                    ⚖️ Termos e Segurança
+                </a>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-1">Conexão Cachú - Beta</p>
+            <a href="https://zeballos.com.br" target="_blank"
+                class="text-xs text-gray-400 hover:text-cyan-600 transition font-medium">
+                &copy; <span id="year"></span> Zeballos Tecnologia
+            </a>
+        </div>
+    </footer>
+    <script src="app.js"></script>
+</body>
+
+</html>

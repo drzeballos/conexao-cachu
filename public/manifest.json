@@ -1,0 +1,22 @@
+{
+  "name": "Conexão Cachú",
+  "short_name": "Conexão",
+  "description": "Caronas solidárias para as cachoeiras da Chapada dos Veadeiros.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0891b2",
+  "theme_color": "#0891b2",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/img/conexao-cachu-192-pwa.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/img/conexao-cachu-512-pwa.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
