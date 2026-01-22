@@ -1,72 +1,13 @@
-console.log("🔥 Frontend v3.0 (Cachú Theme & Cleanup) carregado");
+console.log("🔥 Frontend v3.2 (Cachú Theme - Stable Fade) carregado");
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// === SISTEMA DE DESTAQUES ===
-async function iniciarDestaques() {
-    const container = document.getElementById("highlightContainer");
-    if (!container) return;
-
-    container.classList.add("transition-all", "duration-500", "ease-in-out");
-
-    try {
-        const res = await fetch('/partners');
-        const destaques = await res.json();
-
-        if (!destaques || destaques.length === 0) return;
-
-        let indexAtual = 0;
-        let timer = null;
-
-        function exibirDestaque() {
-            container.classList.add('opacity-0', 'scale-95');
-
-            setTimeout(() => {
-                const item = destaques[indexAtual];
-
-                container.innerHTML = `
-                    <a href="${item.link}" target="_blank" class="block w-full h-full relative group">
-                        <img src="${item.img}" alt="Destaque" class="w-full h-auto rounded-xl shadow-sm transition transform group-hover:scale-[1.01]">
-                        <div class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm">Parceiro</div>
-                    </a>
-                `;
-
-                container.className = "mb-6 relative transition-all duration-500 ease-in-out transform";
-
-                requestAnimationFrame(() => {
-                    container.classList.remove('opacity-0', 'scale-95');
-                });
-
-                const tempo = item.duration || 15000;
-                indexAtual = (indexAtual + 1) % destaques.length;
-
-                if (timer) clearTimeout(timer);
-                timer = setTimeout(exibirDestaque, tempo + 600);
-
-            }, 500);
-        }
-
-        exibirDestaque();
-
-    } catch (err) {
-        console.error("Erro ao carregar destaques:", err);
-        container.classList.remove('opacity-0', 'scale-95');
-    }
-}
-iniciarDestaques();
-
-// === CIDADES E FILTROS (LISTA DE CACHOEIRAS) ===
+// === CIDADES E FILTROS (MANTIDO IGUAL) ===
 const LOCAIS = [
-    // --- BASES / CIDADES ---
-    "Alto Paraíso - Centro",
-    "Vila de São Jorge",
-    "Cavalcante - Centro",
-    "São João D'Aliança - Centro",
-    "Colinas do Sul - Centro",
-    "Teresina de Goiás - Centro",
+    "Alto Paraíso - Centro", "Vila de São Jorge", "Cavalcante - Centro",
+    "São João D'Aliança - Centro", "Colinas do Sul - Centro", "Teresina de Goiás - Centro",
     "Brasília (Aeroporto/Rodoviária)",
-
-    // --- ALTO PARAÍSO ---
+    // ... ALTO PARAÍSO ...
     "Água Fria", "Aldeia Multiétnica", "Almécegas 1, 2 e 3", "São Bento",
     "Alpes Goianos", "Anjos e Arcanjos", "Bona Espero", "Caminho da Lua",
     "Caracol (Complexo do Caldeira)", "Chapada Alta (Sede/Selvagem)",
@@ -76,26 +17,22 @@ const LOCAIS = [
     "Parque Nacional (Portaria)", "Portal Beija-flor", "Praia do Jatobá",
     "Raizama", "Segredo", "Sertão Zen", "Simão Correia",
     "Valle das Pedras", "Vale da Lua",
-
-    // --- CAVALCANTE ---
+    // ... CAVALCANTE ...
     "Ave Maria", "Barroco", "Mundo Novo", "Boqueirão", "Candaru",
     "Cânion São Félix", "Cachoeira Boa Brisa", "Capivara", "Canjica",
     "Complexo do Prata", "Complexo Veredas", "Ponte de Pedra",
     "Poço Xamânico", "Santa Bárbara", "Cachoeira Félix",
     "Vale da Chapada", "Vargem Redonda",
-
-    // --- SÃO JOÃO D'ALIANÇA ---
+    // ... SÃO JOÃO ...
     "Bocaina do Farias", "Cachoeira do Bonito", "Cantinho",
     "Complexo Veadeiros", "Cachoeira do Dragão", "Cachoeira Label",
     "Macaco", "Macaquinhos", "Paraíso dos Cactos",
-
-    // --- COLINAS DO SUL ---
+    // ... COLINAS ...
     "Águas Termais Éden", "Águas Termais Morro Vermelho",
     "Águas Termais do Jequitibá", "Encontro das Águas",
     "Funil do Rio Preto", "Montana", "No Pé da Serra", "Pau Brasil",
     "Pedras Bonitas", "Praia das Pedras", "Lago Serra da Mesa (Lancha)",
-
-    // --- TERESINA DE GOIÁS ---
+    // ... TERESINA ...
     "Fazenda Touro Bravo", "Cachoeira da Força", "Fundo de Quintal",
     "Poço Encantado", "Três Corações", "Jacundá"
 ];
@@ -127,16 +64,13 @@ function atualizarBotoesFiltro() {
     const btnRequest = document.getElementById("btnFilterRequest");
     const baseClass = "px-4 py-2 rounded-xl font-bold text-sm transition border border-transparent bg-gray-100 text-gray-500";
 
-    // Cores neutras no hover
     btnOffer.className = baseClass + " hover:bg-cyan-50";
     btnRequest.className = baseClass + " hover:bg-orange-50";
 
     if (filtroTipoAtual === 'offer') {
-        // Ativo: Cyan (Cachoeira)
         btnOffer.className = "px-4 py-2 rounded-xl font-bold text-sm transition border border-cyan-200 bg-cyan-100 text-cyan-800 shadow-sm ring-2 ring-cyan-100";
     }
     if (filtroTipoAtual === 'request') {
-        // Ativo: Laranja (Destaque)
         btnRequest.className = "px-4 py-2 rounded-xl font-bold text-sm transition border border-orange-200 bg-orange-100 text-orange-800 shadow-sm ring-2 ring-orange-100";
     }
 }
@@ -197,10 +131,12 @@ async function loadRides() {
 
         container.innerHTML = "";
 
+        // Pega a URL base do site atual
+        const baseUrl = window.location.origin;
+
         rides.forEach(ride => {
             const valorFormatado = parseFloat(ride.price).toFixed(2).replace('.', ',');
 
-            // === OPCIONAIS (Sem Mala/Encomenda) ===
             let opcionais = [];
             if (ride.only_woman) opcionais.push("*Só Mulheres*");
             if (ride.pet) opcionais.push("Aceita Pet");
@@ -208,13 +144,10 @@ async function loadRides() {
             const textoOpcionais = opcionais.length > 0 ? opcionais.join(', ') : "Nenhum opcional";
             const linkCaronaRelativo = `carona.html?id=${ride.Id}`;
 
-            const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio no Conexão Cachú.\nDe: ${ride.origin}\nPara: ${ride.destination}\nData: ${formatDateBR(ride.date)} às ${ride.time}\nValor: R$ ${valorFormatado}\nDetalhes: ${textoOpcionais}\n\n---\nhttps://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}\n\`\`\`Zeballos Tecnologia\`\`\``;
+            const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio no Conexão Cachú.\nDe: ${ride.origin}\nPara: ${ride.destination}\nData: ${formatDateBR(ride.date)} às ${ride.time}\nValor: R$ ${valorFormatado}\nDetalhes: ${textoOpcionais}\n\n---\n${baseUrl}/carona.html?id=${ride.Id}\n\`\`\`Zeballos Tecnologia\`\`\``;
             const whatsappUrl = `https://wa.me/55${ride.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMsg)}`;
 
-            // === CORES E BORDAS (TEMA CACHÚ) ===
             const isOffer = ride.type === 'offer';
-
-            // OFERTA: Cyan (Azul Água) | PEDIDO: Laranja (Contraste)
             const badgeColor = isOffer ? "bg-cyan-100 text-cyan-800" : "bg-orange-100 text-orange-800";
             const badgeText = isOffer ? "OFEREÇO" : "PROCURO";
             const borderColor = isOffer ? "bg-cyan-500" : "bg-orange-500";

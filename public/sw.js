@@ -1,77 +1,70 @@
-// 🔥 SEMPRE QUE ATUALIZAR O APP, MUDE ESTE NÚMERO AQUI!
-const CACHE_NAME = "conexao-cachu=v1.0"; // Ou v2.7 - <--- MUDAR ISSO AQUI SEMPRE QUE MUDAR OS ARQUIVOS
-
-const ASSETS = [
-  "/",
-  "/index.html",
-  "/form.html",
-  "/ajuda.html",
-  "/termos.html",
-  "/app.js",  // O navegador vai pegar a versão nova se você mudou no HTML
-  "/form.js",
-  "/carona.js",
-  "/manifest.json",
-  "/favicon.ico",
-  "/img/conexao-cachu.png",
-  "/img/conexao-cachu-192-pwa.png",
-  "/img/conexao-cachu-512-pwa.png"
+const CACHE_NAME = 'conexao-cachu-v10-FINAL'; // Versão nova
+const ASSETS_CRITICOS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png'
+  // Tirei o resto. Se o resto falhar, o site carrega igual pela rede.
 ];
 
-// 1. Instalação: Cacheia tudo e assume o controle IMEDIATO
-self.addEventListener("install", (e) => {
-  // Força o SW novo a entrar em ação sem esperar o antigo desligar
-  self.skipWaiting();
-
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+// 1. INSTALAÇÃO (Garantida)
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Força assumir o controle AGORA
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('🔵 SW v10: Instalando versão leve...');
+      return cache.addAll(ASSETS_CRITICOS);
+    })
   );
 });
 
-// 2. Ativação: Limpa os caches velhos (Faxina)
-self.addEventListener("activate", (e) => {
-  e.waitUntil(
+// 2. ATIVAÇÃO (O Grande Expurgo)
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
-          // Se o cache não for o "v2.5" atual, apaga ele!
+          // Apaga QUALQUER cache que não seja o v10 atual
           if (key !== CACHE_NAME) {
-            console.log('🧹 Limpando cache antigo:', key);
+            console.log('🧹 SW: Deletando cache velho:', key);
             return caches.delete(key);
           }
         })
       );
     })
   );
-  // Garante que o SW controle todas as abas abertas imediatamente
-  self.clients.claim();
+  self.clients.claim(); // Controla as abas abertas imediatamente
 });
 
-// 3. Interceptar Requisições (Network First para API, Stale-While-Revalidate para o resto)
-self.addEventListener("fetch", (e) => {
-  const url = new URL(e.request.url);
+// 3. INTERCEPTAÇÃO (Estratégia: Network First para HTML)
+self.addEventListener('fetch', (event) => {
+  // Se não for GET ou for API, ignora
+  if (event.request.method !== 'GET') return;
+  if (event.request.url.includes('/rides')) return;
+  if (event.request.url.includes('/partners')) return;
 
-  // APIs: Sempre tenta a rede primeiro
-  if (url.pathname.startsWith("/rides") || url.pathname.startsWith("/partners")) {
-    e.respondWith(
-      fetch(e.request).catch(() => caches.match(e.request))
-    );
-    return;
-  }
+  const isHTML = event.request.headers.get('accept').includes('text/html');
 
-  // Arquivos: Tenta cache, mas atualiza em segundo plano (Stale-While-Revalidate)
-  // Isso garante velocidade E atualização na próxima visita
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      const networkFetch = fetch(e.request).then((response) => {
-        // Atualiza o cache com a versão nova da rede
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(e.request, response.clone());
+  event.respondWith(
+    // Tenta a REDE primeiro para tudo que é página
+    fetch(event.request)
+      .then((networkResponse) => {
+        // Se deu certo, clona e atualiza o cache (para o futuro)
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // Se a rede falhar (offline), aí sim usa o cache
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          // Se não tiver nada no cache, retorna a home (fallback)
+          if (isHTML) return caches.match('/');
         });
-        return response;
-      });
-
-      // Retorna o cache se tiver, senão espera a rede
-      return cachedResponse || networkFetch;
-    })
+      })
   );
 });
